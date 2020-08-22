@@ -11,6 +11,9 @@ import net.mamoe.mirai.console.plugins.PluginBase
 import net.mamoe.mirai.console.plugins.withDefaultWriteSave
 import net.mamoe.mirai.event.subscribeFriendMessages
 import net.mamoe.mirai.event.subscribeGroupMessages
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.content
+import net.mamoe.mirai.message.data.forEachContent
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -52,12 +55,12 @@ object LspImageFetcher : PluginBase() {
         if (privateUse) {
             subscribeFriendMessages {
                 (contains(r18ImageTrigger)) {
-                    val image = getImage(true, false, this.sender.id)
+                    val image = getImage(true, false, this.sender.id, extractKeyword(r18ImageTrigger, this.message))
                     reply(getImagePromote(image, sender.nick))
                     sendImage(downloadImage(image.picUrl))
                 }
                 (contains(normalImageTrigger)) {
-                    val image = getImage(false, false, this.sender.id)
+                    val image = getImage(false, false, this.sender.id, extractKeyword(normalImageTrigger, this.message))
                     reply(getImagePromote(image, sender.nick))
                     sendImage(downloadImage(image.picUrl))
                 }
@@ -67,14 +70,14 @@ object LspImageFetcher : PluginBase() {
         subscribeGroupMessages {
             (contains(r18ImageTrigger)) {
                 if (allowGroupR18.contains(this.group.id)) {
-                    val image = getImage(true, true, this.sender.id)
+                    val image = getImage(true, true, this.sender.id, extractKeyword(r18ImageTrigger, this.message))
                     reply(getImagePromote(image, sender.nick))
                     sendImage(downloadImage(image.picUrl))
                 }
             }
             (contains(normalImageTrigger)) {
                 if (allowGroupNormal.contains(this.group.id)) {
-                    val image = getImage(false, true, this.sender.id)
+                    val image = getImage(false, true, this.sender.id, extractKeyword(normalImageTrigger, this.message))
                     reply(getImagePromote(image, sender.nick))
                     sendImage(downloadImage(image.picUrl))
                 }
@@ -82,12 +85,25 @@ object LspImageFetcher : PluginBase() {
         }
     }
 
-    private suspend fun getImage(isR18: Boolean, isGroup: Boolean, requesterId: Long): LspImage {
+    private fun extractKeyword(trigger: String, messageChain: MessageChain): String {
+        messageChain.forEachContent {
+            val words = it.content.split(" ")
+            if (words.size == 2 && words[0] == trigger) {
+                return words[1]
+            } else {
+                return ""
+            }
+        }
+        return ""
+    }
+
+    private fun getImage(isR18: Boolean, isGroup: Boolean, requesterId: Long, keyword: String): LspImage {
         logger.info("Image request from qq id: $requesterId")
         val input = LspImageInput(
             isR18,
             1,
-            useSmallImage
+            useSmallImage,
+            keyword
         )
         return imageProvider.getImage(input)
     }

@@ -1,6 +1,6 @@
 name: "LspImageFetcher"
 author: "Steven Zhang"
-version: "0.1.0"
+version: "0.1.1"
 main: "com.bear.stvzhg.lspImageFetcher.LspImageFetcher"
 info: "A Image fetcher based on lolicon API"
 depends: []

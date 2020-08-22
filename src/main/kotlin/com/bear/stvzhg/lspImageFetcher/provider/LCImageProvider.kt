@@ -21,11 +21,14 @@ class LCImageProvider(
                 "apikey" to apiKey,
                 "r18" to if (input.isR18) "1" else "0",
                 "num" to input.pageSize.toString(),
-                "size1200" to input.isFast.toString()
+                "size1200" to input.isFast.toString(),
+                "keyword" to input.keyword
             )
         )
             .responseObject(LoliconOutput.Deserializer()) {
                 request, response, result ->
+                logger.info(request.toString())
+                logger.info(response.toString())
                 val (output, err) = result
                 if (output != null) {
                     if (output.count == 0 || output.data.size == 0) {
