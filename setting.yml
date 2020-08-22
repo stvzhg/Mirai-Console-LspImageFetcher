@@ -1,0 +1,7 @@
+apiKey: #填写申请好的Lolicon APIKey
+useSmallImage: true #是否使用1200px缩略图 默认true
+normalImageTrigger: 一份色图 #普通图片trigger
+r18ImageTrigger: 不够色 #r18图片trigger
+allowGroupNormal: [] #允许普通图片的群号
+allowGroupR18: [] #允许r18图片的群号
+privateUse: false #是否允许好友私聊使用
